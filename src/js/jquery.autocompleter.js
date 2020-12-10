@@ -1,11 +1,13 @@
 /**
  * A jQuery plugin autocomplete
  * @author Gozoro <gozoro@yandex.ru>
- * @version 1.0.0
+ * @version 1.0.1
  */
 
 ;(function($)
 {
+	'use strict';
+
 	if(typeof($) == 'undefined')
 	{
 		console.warn('Required jQuery.');
@@ -15,15 +17,18 @@
 
 	$.fn.autocompleter = function(variants, options)
 	{
+		var defaultMatchValue = function(item, index){return item;}
+
 		options = $.extend({
             maxResults: 0,
 			minChars: 1,
 			timeout: 500,
 			matchRegexp: function(value, escape){return RegExp(escape(value), 'i')},
-			matchValue:  function(item, index){return item;},
-			itemDisplay: function(item, index){return item;},
+			matchValue:  defaultMatchValue,
+			itemDisplay: options['matchValue'] || defaultMatchValue,
 			itemValue:   null,
-			emptyValue: ''
+			emptyValue: '',
+			ajaxData: function(value){return {value:value};}
         }, options);
 
 		var _this = this;
@@ -35,7 +40,6 @@
 			var useHiddenInput  = (typeof options['itemValue'] == 'function');
 			var searchInput     = $(this);
 			var oldValue        = searchInput.val().trim();
-			var searchInputName = searchInput.attr('name');
 			var hiddenInput     = $('<input type="hidden" value="'+options['emptyValue']+'">');
 			var resultPanel     = $('<div>').addClass('autocompleter-result');
 			var resultPanelVisible = false;
@@ -177,8 +181,8 @@
 			{
 				switch(event.which)
 				{
-					case 38: pressUpArrow(); return;
-					case 40: pressDownArrow(); return;
+					case 38: pressUpArrow(event); return;
+					case 40: pressDownArrow(event); return;
 					case 13: pressEnter(event); return;
 					case 9:  resultPanel.hide(); return; // Tab
 					case 27: resultPanel.hide(); return; // Esc
@@ -214,10 +218,11 @@
 				resultPanel.hide();
 			}
 
-			function pressUpArrow()
+			function pressUpArrow(event)
 			{
 				if(resultPanelVisible)
 				{
+					event.preventDefault();
 					mouseLock = true;
 					var selectedItem = resultPanel.find('.selected').first();
 
@@ -249,6 +254,7 @@
 			{
 				if(resultPanelVisible)
 				{
+					event.preventDefault();
 					mouseLock = true;
 					var selectedItem = resultPanel.find('.selected').first();
 
@@ -331,43 +337,43 @@
 
 				_this.trigger('beforeSearch', {val:value});
 
-				if(!$.isArray(variants))
+				if(variants.constructor.name == 'String')
 				{
-					var data = {};
-					data[searchInputName] = value;
-					$.get(variants, data, function(response){ compilation(value, response); });
+					$.get(variants, options['ajaxData'](value), function(response){ filtering(value, response); });
 				}
 				else
 				{
-					compilation(value, variants);
+
+					filtering(value, variants);
 				}
 			}
 
 
-			function compilation(value, variants)
+			function filtering(value, variants)
 			{
 				var regexp = options['matchRegexp'](value, escapeRegExp);
 				var fullregexp = RegExp('^'+escapeRegExp(value)+'$', regexp.flags);
 				var i = 0;
-				variants.filter(function(item, itemIndex)
-				{
-					var matchValue = options['matchValue'](item, itemIndex);
 
+				for(var itemIndex in variants)
+				{
+					var item = variants[itemIndex];
+					var matchValue = options['matchValue'](item, itemIndex);
+					
 					if(useHiddenInput)
 						var itemValue = options['itemValue'](item, itemIndex);
 					else
 						var itemValue = matchValue;
 
+					if(matchValue.match(fullregexp))
+						hiddenInput.val(itemValue);
 
 					if(matchValue.match(regexp) && (options['maxResults'] <= 0 || i < options['maxResults']))
 					{
 						resultPanel.addResultItem(item, itemIndex);
-						i++;
+						i++
 					}
-
-					if(matchValue.match(fullregexp))
-						hiddenInput.val(itemValue);
-				});
+				}
 
 				_this.trigger('afterSearch', {});
 
