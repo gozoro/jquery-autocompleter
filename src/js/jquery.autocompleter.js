@@ -27,6 +27,7 @@
 			matchValue:  defaultMatchValue,
 			itemDisplay: options['matchValue'] || defaultMatchValue,
 			itemValue:   null,
+			hiddenValue: '',
 			emptyValue: '',
 			ajaxData: function(value){return {value:value};}
         }, options);
@@ -40,7 +41,8 @@
 			var useHiddenInput  = (typeof options['itemValue'] == 'function');
 			var searchInput     = $(this);
 			var oldValue        = searchInput.val().trim();
-			var hiddenInput     = $('<input type="hidden" value="'+options['emptyValue']+'">');
+			var hiddenValue     = options['hiddenValue'] || options['emptyValue'];
+			var hiddenInput     = $('<input type="hidden" value="'+hiddenValue+'">');
 			var resultPanel     = $('<div>').addClass('autocompleter-result');
 			var resultPanelVisible = false;
 			searchInput.after(resultPanel);
@@ -359,7 +361,7 @@
 				{
 					var item = variants[itemIndex];
 					var matchValue = options['matchValue'](item, itemIndex);
-					
+
 					if(useHiddenInput)
 						var itemValue = options['itemValue'](item, itemIndex);
 					else
