@@ -44,21 +44,21 @@ A jQuery plugin autocomplete
 
 ## Options
 
-- **maxResults**
-  Maximum number of suggestions (0 - no limits). Default value is 0.
+- **maxResults:**
+Maximum number of suggestions (0 - no limits). Default value is 0.
 
-- **maxResults**
-  Maximum number of suggestions (0 - no limits). Default value is 0.
+- **maxResults:**
+Maximum number of suggestions (0 - no limits). Default value is 0.
 
-- **minChars**
-  Minimum number of characters for the suggestions. Default value is 1.
+- **minChars:**
+Minimum number of characters for the suggestions. Default value is 1.
 
-- **timeout**
-  Keyboard input timeout. Default value is 500 ms.
+- **timeout:**
+Keyboard input timeout. Default value is 500 ms.
 
-- **matchRegexp**
-  Function must be returns a regexp-object used for filtering.
-  Default value:
+- **matchRegexp:**
+Function must be returns a regexp-object used for filtering.
+Default value:
 ```javascript
 	function(value, escape)
 	{
@@ -66,9 +66,9 @@ A jQuery plugin autocomplete
 	}
 ```
 
-- **matchValue**
-  Function must be returns a value used for filtering.
-  Default value:
+- **matchValue:**
+Function must be returns a value used for filtering.
+Default value:
 ```javascript
 	function(item, index)
 	{
@@ -76,9 +76,9 @@ A jQuery plugin autocomplete
 	}
 ```
 
-- **itemDisplay**
-  Function must be returns a value used for display a suggestions.
-  Default value:
+- **itemDisplay:**
+Function must be returns a value used for display a suggestions.
+Default value:
 ```javascript
 	function(item, index)
 	{
@@ -86,15 +86,15 @@ A jQuery plugin autocomplete
 	}
 ```
 
-- **itemValue**
-  You can set a function returns a value for the request. Default value is "matchValue".
+- **itemValue:**
+You can set a function returns a value for the request. Default value is "matchValue".
 
-- **emptyValue**
-  Empty value when itemValue is used.
+- **emptyValue:**
+Empty value when itemValue is used.
 
-- **ajaxData**
-  Function must be returns default ajax-request data.
-  Default value:
+- **ajaxData:**
+Function must be returns default ajax-request data.
+Default value:
 ```javascript
 	function(value)
 	{
@@ -102,5 +102,5 @@ A jQuery plugin autocomplete
 	}
 ```
 
-- **hiddenValue**
-  Default value for the hidden input. Default value is "".
+- **hiddenValue:**
+Default value for the hidden input. Default value is "".
