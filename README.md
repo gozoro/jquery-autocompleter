@@ -89,7 +89,7 @@ A jQuery plugin autocomplete
 - **itemValue**
   You can set a function returns a value for the request. Default value is "matchValue".
 
-- **emptyValue**  => ''
+- **emptyValue**
   Empty value when itemValue is used.
 
 - **ajaxData**
