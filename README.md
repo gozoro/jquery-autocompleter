@@ -7,7 +7,7 @@ A jQuery plugin autocomplete
 
 ## Installation
 ```code
-	composer require gozoro/image
+	composer require gozoro/jquery-autocompleter
 ```
 
 ## Usage
