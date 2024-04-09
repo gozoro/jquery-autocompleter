@@ -256,7 +256,6 @@
 			{
 				if(resultPanelVisible)
 				{
-					event.preventDefault();
 					mouseLock = true;
 					var selectedItem = resultPanel.find('.selected').first();
 
