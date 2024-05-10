@@ -1,7 +1,7 @@
 /**
  * A jQuery plugin autocomplete
  * @author Gozoro <gozoro@yandex.ru>
- * @version 1.0.1
+ *
  */
 
 ;(function($)
@@ -32,31 +32,34 @@
 			ajaxData: function(value){return {value:value};}
         }, options);
 
+		//TODO:: selection locking
+
 		var _this = this;
 
 
 		return this.each(function()
 		{
-			var mouseLock       = false;
+			var mouseLock            = false;
+			var $dropdownListVisible = false;
 			var useHiddenInput  = (typeof options['itemValue'] == 'function');
-			var searchInput     = $(this);
-			var oldValue        = searchInput.val().trim();
+			var $searchInput    = $(this);
+			var oldValue        = $searchInput.val().trim();
 			var hiddenValue     = options['hiddenValue'] || options['emptyValue'];
-			var hiddenInput     = $('<input type="hidden" value="'+hiddenValue+'">');
-			var resultPanel     = $('<div>').addClass('autocompleter-result');
-			var resultPanelVisible = false;
-			searchInput.after(resultPanel);
+			var $hiddenInput    = $('<input type="hidden" value="'+hiddenValue+'">');
+			var $dropdownList   = $('<div class="multiselect-dropdownlist">');
+
+			$searchInput.after($dropdownList);
 
 
 
 			function reposition()
 			{
-				var pos = searchInput.position();
+				var pos = $searchInput.position();
 
-				resultPanel.css({
+				$dropdownList.css({
 					left: pos.left,
-					top: pos.top + searchInput.outerHeight(),
-					width: searchInput.outerWidth()
+					top: pos.top + $searchInput.outerHeight(),
+					width: $searchInput.outerWidth()
 				});
 			}
 
@@ -69,65 +72,65 @@
 
 			if(useHiddenInput)
 			{
-				hiddenInput.attr('name', searchInput.attr('name') );
-				searchInput.removeAttr('name').after(hiddenInput);
+				$hiddenInput.attr('name', $searchInput.attr('name') );
+				$searchInput.removeAttr('name').after($hiddenInput);
 			}
 
-			resultPanel.unselect = function()
+			$dropdownList.unselect = function()
 			{
-				resultPanel.find('.selected').removeClass('selected');
+				$dropdownList.find('.selected').removeClass('selected');
 				return this;
 			}
 
-			resultPanel.show = function()
+			$dropdownList.show = function()
 			{
 				$.fn.show.apply(this, arguments);
 
-				resultPanelVisible = true;
-				resultPanel.unselect().scrollTop(0).children().first().addClass('selected');
+				$dropdownListVisible = true;
+				$dropdownList.unselect().scrollTop(0).children().first().addClass('selected');
 				_this.trigger('resultShow', {});
 			}
 
-			resultPanel.hide = function()
+			$dropdownList.hide = function()
 			{
 				$.fn.hide.apply(this, arguments);
 
-				resultPanelVisible = false;
+				$dropdownListVisible = false;
 				_this.trigger('resultHide', {});
 			}
 
-			searchInput.blur(function()
+			$searchInput.blur(function()
 			{
-				resultPanel.hide();
+				$dropdownList.hide();
 			});
 
-			searchInput.click(function()
+			$searchInput.click(function()
 			{
-				search( searchInput.val(), 1);
+				search( $searchInput.val(), 1);
 			});
 
-			searchInput.on('paste', function(event)
+			$searchInput.on('paste', function(event)
 			{
 				search( event.originalEvent.clipboardData.getData('text'), 1);
 			});
 
 
-			resultPanel.mouseout(function()
+			$dropdownList.mouseout(function()
 			{
 				if(!mouseLock)
 				{
-					resultPanel.unselect();
+					$dropdownList.unselect();
 				}
 			});
 
-			resultPanel.reselect = function(row)
+			$dropdownList.reselect = function(row)
 			{
 				mouseLock = false;
-				resultPanel.unselect();
+				$dropdownList.unselect();
 				$(row).addClass('selected');
 			}
 
-			resultPanel.addResultItem = function(item, itemIndex)
+			$dropdownList.addResultItem = function(item, itemIndex)
 			{
 				var matchValue = options['matchValue'](item, itemIndex);
 
@@ -150,58 +153,58 @@
 							})
 							.click(function()
 							{
-								resultPanel.selectVariant($(this)).hide();
+								$dropdownList.selectVariant($(this)).hide();
 							})
 							.mouseover(function()
 							{
 								if(!mouseLock)
 								{
-									resultPanel.reselect(this);
+									$dropdownList.reselect(this);
 								}
 							})
 							.mousemove(function()
 							{
 								if(mouseLock)
 								{
-									resultPanel.reselect(this);
+									$dropdownList.reselect(this);
 								}
 							})
 							;
 
-							resultPanel.append(resultRow);
+							$dropdownList.append(resultRow);
 			}
 
-			searchInput.keyup(function()
+			$searchInput.keyup(function()
 			{
 				inputDelay(function()
 				{
-					search( searchInput.val() );
+					search( $searchInput.val() );
 				});
 			});
 
-			searchInput.keydown(function(event)
+			$searchInput.keydown(function(event)
 			{
 				switch(event.which)
 				{
 					case 38: pressUpArrow(event); return;
 					case 40: pressDownArrow(event); return;
 					case 13: pressEnter(event); return;
-					case 9:  resultPanel.hide(); return; // Tab
-					case 27: resultPanel.hide(); return; // Esc
+					case 9:  $dropdownList.hide(); return; // Tab
+					case 27: $dropdownList.hide(); return; // Esc
 				}
 			});
 
-			resultPanel.selectVariant = function(variant)
+			$dropdownList.selectVariant = function(variant)
 			{
 				var matchValue = variant.data('match-value');
 				var itemValue = variant.data('value');
 
 				if(useHiddenInput)
-					hiddenInput.val(itemValue);
+					$hiddenInput.val(itemValue);
 
-				searchInput.val( matchValue );
+				$searchInput.val( matchValue );
 				oldValue = matchValue;
-				resultPanel.empty();
+				$dropdownList.empty();
 
 				return this;
 			}
@@ -210,82 +213,82 @@
 			{
 				event.preventDefault();
 
-				var selectedVariant = resultPanel.find('.selected').first();
+				var selectedVariant = $dropdownList.find('.selected').first();
 
 				if(selectedVariant.length)
 				{
-					resultPanel.unselect().selectVariant(selectedVariant);
+					$dropdownList.unselect().selectVariant(selectedVariant);
 				}
 
-				resultPanel.hide();
+				$dropdownList.hide();
 			}
 
 			function pressUpArrow(event)
 			{
-				if(resultPanelVisible)
+				if($dropdownListVisible)
 				{
 					event.preventDefault();
 					mouseLock = true;
-					var selectedItem = resultPanel.find('.selected').first();
+					var selectedItem = $dropdownList.find('.selected').first();
 
 					if(selectedItem.length)
 					{
-						resultPanel.unselect();
+						$dropdownList.unselect();
 
 						var prevItem = selectedItem.prev();
 
 						if(prevItem.length)
 						{
 							var itemTop = prevItem.addClass('selected').position().top ;
-							var offset  = resultPanel.position().top - prevItem.innerHeight();
+							var offset  = $dropdownList.position().top - prevItem.innerHeight();
 
 							if(itemTop < offset)
 							{
-								resultPanel.scrollTop( resultPanel.scrollTop() + offset + itemTop );
+								$dropdownList.scrollTop( $dropdownList.scrollTop() + offset + itemTop );
 							}
 							return;
 						}
 					}
 
-					resultPanel.scrollTop( resultPanel.get(0).scrollHeight ).children().last().addClass('selected');
+					$dropdownList.scrollTop( $dropdownList.get(0).scrollHeight ).children().last().addClass('selected');
 				}
 			}
 
 
 			function pressDownArrow()
 			{
-				if(resultPanelVisible)
+				if($dropdownListVisible)
 				{
 					mouseLock = true;
-					var selectedItem = resultPanel.find('.selected').first();
+					var selectedItem = $dropdownList.find('.selected').first();
 
 					if(selectedItem.length)
 					{
-						resultPanel.unselect();
+						$dropdownList.unselect();
 
 						var nextItem = selectedItem.next();
 
 						if(nextItem.length)
 						{
-							var panelHeight = resultPanel.outerHeight() ;
+							var panelHeight = $dropdownList.outerHeight() ;
 							var itemHeight  = nextItem.addClass('selected').innerHeight();
 							var itemBottom  = nextItem.position().top + itemHeight;
 
 							if(itemBottom > panelHeight)
 							{
-								resultPanel.scrollTop( resultPanel.scrollTop() + itemHeight - resultPanel.position().top - panelHeight + itemBottom );
+								$dropdownList.scrollTop( $dropdownList.scrollTop() + itemHeight - $dropdownList.position().top - panelHeight + itemBottom );
 							}
 							return;
 						}
 					}
 
-					resultPanel.scrollTop( 0 ).children().first().addClass('selected');
+					$dropdownList.scrollTop( 0 ).children().first().addClass('selected');
 				}
 				else
 				{
-					if(resultPanel.children().length)
+					if($dropdownList.children().length)
 					{
-						resultPanel.show();
+						$dropdownList.show();
 					}
 				}
 			}
@@ -318,21 +321,21 @@
 
 				if(value === oldValue)
 				{
-					if(forceShow && resultPanel.children().length)
+					if(forceShow && $dropdownList.children().length)
 					{
-					    resultPanel.show();
+					    $dropdownList.show();
 					}
 
 					return;
 				}
 
-				hiddenInput.val(options['emptyValue']);
+				$hiddenInput.val(options['emptyValue']);
 				oldValue = value;
-				resultPanel.empty();
+				$dropdownList.empty();
 
 				if(!value || value.length < options['minChars'])
 				{
-					resultPanel.hide();
+					$dropdownList.hide();
 					return;
 				}
 
@@ -367,21 +370,21 @@
 						var itemValue = matchValue;
 
 					if(matchValue.match(fullregexp))
-						hiddenInput.val(itemValue);
+						$hiddenInput.val(itemValue);
 
 					if(matchValue.match(regexp) && (options['maxResults'] <= 0 || i < options['maxResults']))
 					{
-						resultPanel.addResultItem(item, itemIndex);
+						$dropdownList.addResultItem(item, itemIndex);
 						i++
 					}
 				}
 
 				_this.trigger('afterSearch', {});
 
-				if(resultPanel.children().length)
-					resultPanel.show();
+				if($dropdownList.children().length)
+					$dropdownList.show();
 				else
-					resultPanel.hide();
+					$dropdownList.hide();
 			}
 		}); // end each
 	};
