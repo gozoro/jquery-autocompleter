@@ -27,8 +27,7 @@
 			matchValue:  defaultMatchValue,
 			itemDisplay: options['matchValue'] || defaultMatchValue,
 			itemValue:   null,
-			hiddenValue: '',
-			emptyValue: '',
+			hiddenDefaultValue: '',
 			ajaxData: function(value){return {value:value};}
         }, options);
 
@@ -44,7 +43,7 @@
 			var useHiddenInput  = (typeof options['itemValue'] == 'function');
 			var $searchInput    = $(this);
 			var oldValue        = $searchInput.val().trim();
-			var hiddenValue     = options['hiddenValue'] || options['emptyValue'];
+			var hiddenValue     = options['hiddenDefaultValue'];
 			var $hiddenInput    = $('<input type="hidden" value="'+hiddenValue+'">');
 			var $dropdownList   = $('<div class="multiselect-dropdownlist">');
 
@@ -123,14 +122,7 @@
 				}
 			});
 
-			$dropdownList.reselect = function(row)
-			{
-				mouseLock = false;
-				$dropdownList.unselect();
-				$(row).addClass('selected');
-			}
-
-			$dropdownList.addResultItem = function(item, itemIndex)
+			$dropdownList.addItem = function(item, itemIndex)
 			{
 				var matchValue = options['matchValue'](item, itemIndex);
 
@@ -143,7 +135,7 @@
 					var itemValue = matchValue;
 				}
 
-				var resultRow = $('<div>').addClass('autocompleter-item')
+				var $row = $('<div>').addClass('autocompleter-item')
 							.attr('data-match-value', matchValue)
 							.attr('data-value', itemValue)
 							.html( options['itemDisplay'](item, itemIndex) )
@@ -159,19 +151,23 @@
 							{
 								if(!mouseLock)
 								{
-									$dropdownList.reselect(this);
+									mouseLock = false;
+									$dropdownList.unselect();
+									$row.addClass('selected');
 								}
 							})
 							.mousemove(function()
 							{
 								if(mouseLock)
 								{
-									$dropdownList.reselect(this);
+									mouseLock = false;
+									$dropdownList.unselect();
+									$row.addClass('selected');
 								}
 							})
 							;
 
-							$dropdownList.append(resultRow);
+							$dropdownList.append($row);
 			}
 
 			$searchInput.keyup(function()
@@ -333,7 +329,7 @@
 					return;
 				}
 
-				$hiddenInput.val(options['emptyValue']);
+				$hiddenInput.val(options['hiddenDefaultValue']);
 				oldValue = value;
 				$dropdownList.empty();
 
@@ -378,7 +374,7 @@
 
 					if(matchValue.match(regexp) && (options['maxResults'] <= 0 || i < options['maxResults']))
 					{
-						$dropdownList.addResultItem(item, itemIndex);
+						$dropdownList.addItem(item, itemIndex);
 						i++
 					}
 				}
