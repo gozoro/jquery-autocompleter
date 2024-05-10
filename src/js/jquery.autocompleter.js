@@ -40,7 +40,7 @@
 		return this.each(function()
 		{
 			var mouseLock            = false;
-			var $dropdownListVisible = false;
+			var dropdownListVisible = false;
 			var useHiddenInput  = (typeof options['itemValue'] == 'function');
 			var $searchInput    = $(this);
 			var oldValue        = $searchInput.val().trim();
@@ -86,7 +86,7 @@
 			{
 				$.fn.show.apply(this, arguments);
 
-				$dropdownListVisible = true;
+				dropdownListVisible = true;
 				$dropdownList.unselect().scrollTop(0).children().first().addClass('selected');
 				_this.trigger('resultShow', {});
 			}
@@ -95,7 +95,7 @@
 			{
 				$.fn.hide.apply(this, arguments);
 
-				$dropdownListVisible = false;
+				dropdownListVisible = false;
 				_this.trigger('resultHide', {});
 			}
 
@@ -189,8 +189,7 @@
 					case 38: pressUpArrow(event); return;
 					case 40: pressDownArrow(event); return;
 					case 13: pressEnter(event); return;
-					case 9:  $dropdownList.hide(); return; // Tab
-					case 27: $dropdownList.hide(); return; // Esc
+					case 27: pressEsc(event); return;
 				}
 			});
 
@@ -209,6 +208,11 @@
 				return this;
 			}
 
+			function pressEsc(event)
+			{
+				$dropdownList.hide();
+			}
+
 			function pressEnter(event)
 			{
 				event.preventDefault();
@@ -225,22 +229,22 @@
 
 			function pressUpArrow(event)
 			{
-				if($dropdownListVisible)
+				if(dropdownListVisible)
 				{
 					event.preventDefault();
 					mouseLock = true;
-					var selectedItem = $dropdownList.find('.selected').first();
+					var $selectedItem = $dropdownList.find('.selected').first();
 
-					if(selectedItem.length)
+					if($selectedItem.length)
 					{
 						$dropdownList.unselect();
 
-						var prevItem = selectedItem.prev();
+						var $prevItem = $selectedItem.prev();
 
-						if(prevItem.length)
+						if($prevItem.length)
 						{
-							var itemTop = prevItem.addClass('selected').position().top ;
-							var offset  = $dropdownList.position().top - prevItem.innerHeight();
+							var itemTop = $prevItem.addClass('selected').position().top ;
+							var offset  = $dropdownList.position().top - $prevItem.innerHeight();
 
 							if(itemTop < offset)
 							{
@@ -257,22 +261,22 @@
 
 			function pressDownArrow()
 			{
-				if($dropdownListVisible)
+				if(dropdownListVisible)
 				{
 					mouseLock = true;
-					var selectedItem = $dropdownList.find('.selected').first();
+					var $selectedItem = $dropdownList.find('.selected').first();
 
-					if(selectedItem.length)
+					if($selectedItem.length)
 					{
 						$dropdownList.unselect();
 
-						var nextItem = selectedItem.next();
+						var $nextItem = $selectedItem.next();
 
-						if(nextItem.length)
+						if($nextItem.length)
 						{
 							var panelHeight = $dropdownList.outerHeight() ;
-							var itemHeight  = nextItem.addClass('selected').innerHeight();
-							var itemBottom  = nextItem.position().top + itemHeight;
+							var itemHeight  = $nextItem.addClass('selected').innerHeight();
+							var itemBottom  = $nextItem.position().top + itemHeight;
 
 							if(itemBottom > panelHeight)
 							{
