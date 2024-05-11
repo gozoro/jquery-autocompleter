@@ -98,17 +98,15 @@
 				_this.trigger('resultHide', {});
 			}
 
-			$searchInput.blur(function()
-			{
-				$dropdownList.hide();
-			});
-
 			$searchInput.click(function()
 			{
 				search( $searchInput.val(), 1);
-			});
-
-			$searchInput.on('paste', function(event)
+			})
+			.blur(function()
+			{
+				$dropdownList.hide();
+			})
+			.on('paste', function(event)
 			{
 				search( event.originalEvent.clipboardData.getData('text'), 1);
 			});
@@ -117,10 +115,30 @@
 			$dropdownList.mouseout(function()
 			{
 				if(!mouseLock)
-				{
 					$dropdownList.unselect();
-				}
 			});
+
+
+			$searchInput.select = function($row)
+			{
+				//var $row = $dropdownList.find('.selected').first();
+
+				//if($row.length)
+				//{
+					$dropdownList.unselect().empty();
+
+					if(useHiddenInput)
+						$hiddenInput.val( $row.data('value') );
+
+
+					var matchValue = $row.data('match-value'); //TODO:: rename to display-value?
+					$searchInput.val( matchValue );
+					oldValue = matchValue;
+				//}
+
+				return this;
+			}
+
 
 			$dropdownList.addItem = function(item, itemIndex)
 			{
@@ -135,18 +153,22 @@
 					var itemValue = matchValue;
 				}
 
-				var $row = $('<div>').addClass('autocompleter-item')
+				var $row = $('<div class="autocompleter-item">')
 							.attr('data-match-value', matchValue)
 							.attr('data-value', itemValue)
 							.html( options['itemDisplay'](item, itemIndex) )
 							.mousedown(function(event)
 							{
+
 								event.preventDefault(); // This prevents the element from being hidden by .blur before it's clicked
+
+								$searchInput.select($row);
+								$dropdownList.hide();
 							})
-							.click(function()
-							{
-								$dropdownList.selectVariant($(this)).hide();
-							})
+							//.click(function()
+							//{
+							//	$dropdownList.selectVariant($(this)).hide();
+							//})
 							.mouseover(function()
 							{
 								if(!mouseLock)
@@ -189,20 +211,20 @@
 				}
 			});
 
-			$dropdownList.selectVariant = function(variant)
-			{
-				var matchValue = variant.data('match-value');
-				var itemValue = variant.data('value');
-
-				if(useHiddenInput)
-					$hiddenInput.val(itemValue);
-
-				$searchInput.val( matchValue );
-				oldValue = matchValue;
-				$dropdownList.empty();
-
-				return this;
-			}
+//			$dropdownList.selectVariant = function(variant)
+//			{
+//				var matchValue = variant.data('match-value');
+//				var itemValue = variant.data('value');
+//
+//				if(useHiddenInput)
+//					$hiddenInput.val(itemValue);
+//
+//				$searchInput.val( matchValue );
+//				oldValue = matchValue;
+//				$dropdownList.empty();
+//
+//				return this;
+//			}
 
 			function pressEsc(event)
 			{
@@ -213,13 +235,15 @@
 			{
 				event.preventDefault();
 
-				var selectedVariant = $dropdownList.find('.selected').first();
-
-				if(selectedVariant.length)
+				var $row = $dropdownList.find('.selected').first();
+//
+				if($row.length)
 				{
-					$dropdownList.unselect().selectVariant(selectedVariant);
+//					$dropdownList.unselect().selectVariant(selectedVariant);
+					$searchInput.select($row);
 				}
-
+//
+//
 				$dropdownList.hide();
 			}
 
@@ -294,10 +318,7 @@
 			}
 
 
-			function escapeRegExp(str)
-			{
-				return str.replace(/[.*+\-?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
-			}
+
 
 
 			var locks = [];
@@ -350,6 +371,12 @@
 
 					filtering(value, variants);
 				}
+			}
+
+
+			function escapeRegExp(str)
+			{
+				return str.replace(/[.*+\-?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
 			}
 
 
