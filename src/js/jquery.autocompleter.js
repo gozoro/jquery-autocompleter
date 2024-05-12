@@ -17,8 +17,6 @@
 
 	$.fn.autocompleter = function(variants, options)
 	{
-		var defaultMatchValue = function(item, index){return item;}
-
 		options = $.extend({
             maxResults: 0,
 			minChars: 1,
@@ -31,14 +29,9 @@
 
 			matchRegexp: function(value, escape){return RegExp(escape(value), 'i')},
 
-			matchValue:  defaultMatchValue,
-			itemDisplay: options['matchValue'] || defaultMatchValue
 
-
-
-
-
-
+			matchValue:  function(item, index){return item;},
+			row:         function(item, index){return item;}
 
         }, options);
 
@@ -121,20 +114,14 @@
 
 			$searchInput.select = function($row)
 			{
-				//var $row = $dropdownList.find('.selected').first();
+				$dropdownList.unselect().empty();
 
-				//if($row.length)
-				//{
-					$dropdownList.unselect().empty();
+				if(useHiddenInput)
+					$hiddenInput.val( $row.data('value') );
 
-					if(useHiddenInput)
-						$hiddenInput.val( $row.data('value') );
-
-
-					var matchValue = $row.data('match-value'); //TODO:: rename to display-value?
-					$searchInput.val( matchValue );
-					oldValue = matchValue;
-				//}
+				var matchValue = $row.data('match-value'); //TODO:: rename to display-value?
+				$searchInput.val( matchValue );
+				oldValue = matchValue;
 
 				return this;
 			}
@@ -143,13 +130,12 @@
 			$dropdownList.addItem = function(item, itemIndex)
 			{
 				var matchValue = options['matchValue'](item, itemIndex);
-
 				var value = useHiddenInput ? options['value'](item, itemIndex) : matchValue;
 
 				var $row = $('<div class="autocompleter-item">')
 							.attr('data-match-value', matchValue)
 							.attr('data-value', value)
-							.html( options['itemDisplay'](item, itemIndex) )
+							.html( options['row'](item, itemIndex) )
 							.mousedown(function(event)
 							{
 
@@ -158,10 +144,6 @@
 								$searchInput.select($row);
 								$dropdownList.hide();
 							})
-							//.click(function()
-							//{
-							//	$dropdownList.selectVariant($(this)).hide();
-							//})
 							.mouseover(function()
 							{
 								if(!mouseLock)
@@ -182,7 +164,7 @@
 							})
 							;
 
-							$dropdownList.append($row);
+				$dropdownList.append($row);
 			}
 
 
