@@ -23,12 +23,23 @@
             maxResults: 0,
 			minChars: 1,
 			timeout: 500,
-			matchRegexp: function(value, escape){return RegExp(escape(value), 'i')},
-			matchValue:  defaultMatchValue,
-			itemDisplay: options['matchValue'] || defaultMatchValue,
-			itemValue:   null,
+			ajaxData: function(value){return {value:value};},
 			hiddenDefaultValue: '',
-			ajaxData: function(value){return {value:value};}
+			value:   null,
+
+
+
+			matchRegexp: function(value, escape){return RegExp(escape(value), 'i')},
+
+			matchValue:  defaultMatchValue,
+			itemDisplay: options['matchValue'] || defaultMatchValue
+
+
+
+
+
+
+
         }, options);
 
 		//TODO:: selection locking
@@ -40,7 +51,7 @@
 		{
 			var mouseLock            = false;
 			var dropdownListVisible = false;
-			var useHiddenInput  = (typeof options['itemValue'] == 'function');
+			var useHiddenInput  = (typeof options['value'] == 'function');
 			var $searchInput    = $(this);
 			var oldValue        = $searchInput.val().trim();
 			var hiddenValue     = options['hiddenDefaultValue'];
@@ -98,18 +109,7 @@
 				_this.trigger('resultHide', {});
 			}
 
-			$searchInput.click(function()
-			{
-				search( $searchInput.val(), 1);
-			})
-			.blur(function()
-			{
-				$dropdownList.hide();
-			})
-			.on('paste', function(event)
-			{
-				search( event.originalEvent.clipboardData.getData('text'), 1);
-			});
+
 
 
 			$dropdownList.mouseout(function()
@@ -144,18 +144,11 @@
 			{
 				var matchValue = options['matchValue'](item, itemIndex);
 
-				if(useHiddenInput)
-				{
-					var itemValue = options['itemValue'](item, itemIndex);
-				}
-				else
-				{
-					var itemValue = matchValue;
-				}
+				var value = useHiddenInput ? options['value'](item, itemIndex) : matchValue;
 
 				var $row = $('<div class="autocompleter-item">')
 							.attr('data-match-value', matchValue)
-							.attr('data-value', itemValue)
+							.attr('data-value', value)
 							.html( options['itemDisplay'](item, itemIndex) )
 							.mousedown(function(event)
 							{
@@ -192,15 +185,27 @@
 							$dropdownList.append($row);
 			}
 
-			$searchInput.keyup(function()
+
+			$searchInput.click(function()
+			{
+				search( $searchInput.val(), 1);
+			})
+			.blur(function()
+			{
+				$dropdownList.hide();
+			})
+			.on('paste', function(event)
+			{
+				search( event.originalEvent.clipboardData.getData('text'), 1);
+			})
+			.keyup(function()
 			{
 				inputDelay(function()
 				{
 					search( $searchInput.val() );
 				});
-			});
-
-			$searchInput.keydown(function(event)
+			})
+			.keydown(function(event)
 			{
 				switch(event.which)
 				{
@@ -211,20 +216,6 @@
 				}
 			});
 
-//			$dropdownList.selectVariant = function(variant)
-//			{
-//				var matchValue = variant.data('match-value');
-//				var itemValue = variant.data('value');
-//
-//				if(useHiddenInput)
-//					$hiddenInput.val(itemValue);
-//
-//				$searchInput.val( matchValue );
-//				oldValue = matchValue;
-//				$dropdownList.empty();
-//
-//				return this;
-//			}
 
 			function pressEsc(event)
 			{
@@ -236,14 +227,10 @@
 				event.preventDefault();
 
 				var $row = $dropdownList.find('.selected').first();
-//
+
 				if($row.length)
-				{
-//					$dropdownList.unselect().selectVariant(selectedVariant);
 					$searchInput.select($row);
-				}
-//
-//
+
 				$dropdownList.hide();
 			}
 
@@ -392,12 +379,12 @@
 					var matchValue = options['matchValue'](item, itemIndex);
 
 					if(useHiddenInput)
-						var itemValue = options['itemValue'](item, itemIndex);
+						var value = options['value'](item, itemIndex);
 					else
-						var itemValue = matchValue;
+						var value = matchValue;
 
 					if(matchValue.match(fullregexp))
-						$hiddenInput.val(itemValue);
+						$hiddenInput.val(value);
 
 					if(matchValue.match(regexp) && (options['maxResults'] <= 0 || i < options['maxResults']))
 					{
