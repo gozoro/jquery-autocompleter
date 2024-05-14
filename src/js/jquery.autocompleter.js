@@ -23,19 +23,17 @@
 			timeout: 500,
 			ajaxData: function(value){return {value:value};},
 			hiddenDefaultValue: '',
+
+			row:     function(item, index){return item;},
 			value:   null,
 
-
-
-			matchRegexp: function(value, escape){return RegExp(escape(value), 'i')},
-
-
 			matchValue:  function(item, index){return item;},
-			row:         function(item, index){return item;}
+
+			filter: function(item, index, searchValue, matchValue){
+				return matchValue.match( RegExp('^'+searchValue.replace(/[.*+\-?^${}()|[\]\\]/g, '\\$&'), 'i') );
+			}
 
         }, options);
-
-		//TODO:: selection locking
 
 		var _this = this;
 
@@ -119,9 +117,10 @@
 				if(useHiddenInput)
 					$hiddenInput.val( $row.data('value') );
 
-				var matchValue = $row.data('match-value'); //TODO:: rename to display-value?
+				var matchValue = $row.data('match-value');
 				$searchInput.val( matchValue );
 				oldValue = matchValue;
+
 
 				return this;
 			}
@@ -164,7 +163,7 @@
 							})
 							;
 
-				$dropdownList.append($row);
+							$dropdownList.append($row);
 			}
 
 
@@ -343,39 +342,25 @@
 			}
 
 
-			function escapeRegExp(str)
+			function filtering(searchValue, variants)
 			{
-				return str.replace(/[.*+\-?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
-			}
-
-
-			function filtering(value, variants)
-			{
-				var regexp = options['matchRegexp'](value, escapeRegExp);
-				var fullregexp = RegExp('^'+escapeRegExp(value)+'$', regexp.flags);
 				var i = 0;
-
 				for(var itemIndex in variants)
 				{
 					var item = variants[itemIndex];
 					var matchValue = options['matchValue'](item, itemIndex);
 
-					if(useHiddenInput)
-						var value = options['value'](item, itemIndex);
-					else
-						var value = matchValue;
-
-					if(matchValue.match(fullregexp))
-						$hiddenInput.val(value);
-
-					if(matchValue.match(regexp) && (options['maxResults'] <= 0 || i < options['maxResults']))
+					if( options['filter'](item, itemIndex, searchValue, matchValue) && (options['maxResults'] <= 0 || i < options['maxResults']) )
 					{
+						var value = useHiddenInput ? options['value'](item, itemIndex) : matchValue;
+
+						if(matchValue === searchValue)
+							$hiddenInput.val(value);
+
 						$dropdownList.addItem(item, itemIndex);
-						i++
+						i++;
 					}
 				}
-
-				_this.trigger('afterSearch', {});
 
 				if($dropdownList.children().length)
 					$dropdownList.show();
