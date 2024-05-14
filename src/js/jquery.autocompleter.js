@@ -23,10 +23,8 @@
 			timeout: 500,
 			ajaxData: function(value){return {value:value};},
 			hiddenDefaultValue: '',
-
-			row:     function(item, index){return item;},
 			value:   null,
-
+			row:     function(item, index){return item;},
 			matchValue:  function(item, index){return item;},
 
 			filter: function(item, index, searchValue, matchValue){
@@ -40,18 +38,14 @@
 
 		return this.each(function()
 		{
-			var mouseLock            = false;
+			var mouseLock           = false;
 			var dropdownListVisible = false;
-			var useHiddenInput  = (typeof options['value'] == 'function');
-			var $searchInput    = $(this);
-			var oldValue        = $searchInput.val().trim();
-			var hiddenValue     = options['hiddenDefaultValue'];
-			var $hiddenInput    = $('<input type="hidden" value="'+hiddenValue+'">');
-			var $dropdownList   = $('<div class="multiselect-dropdownlist">');
-
-			$searchInput.after($dropdownList);
-
-
+			var useHiddenInput      = (typeof options['value'] == 'function');
+			var $searchInput        = $(this);
+			var oldValue            = $searchInput.val().trim();
+			var hiddenValue         = options['hiddenDefaultValue'];
+			var $hiddenInput        = $('<input type="hidden" value="'+hiddenValue+'">');
+			var $dropdownList       = $('<div class="multiselect-dropdownlist">');
 
 			function reposition()
 			{
@@ -100,17 +94,13 @@
 				_this.trigger('resultHide', {});
 			}
 
-
-
-
 			$dropdownList.mouseout(function()
 			{
 				if(!mouseLock)
 					$dropdownList.unselect();
 			});
 
-
-			$searchInput.select = function($row)
+			$dropdownList.select = function($row)
 			{
 				$dropdownList.unselect().empty();
 
@@ -121,10 +111,8 @@
 				$searchInput.val( matchValue );
 				oldValue = matchValue;
 
-
 				return this;
 			}
-
 
 			$dropdownList.addItem = function(item, itemIndex)
 			{
@@ -137,11 +125,8 @@
 							.html( options['row'](item, itemIndex) )
 							.mousedown(function(event)
 							{
-
 								event.preventDefault(); // This prevents the element from being hidden by .blur before it's clicked
-
-								$searchInput.select($row);
-								$dropdownList.hide();
+								$dropdownList.select($row).hide();
 							})
 							.mouseover(function()
 							{
@@ -160,14 +145,13 @@
 									$dropdownList.unselect();
 									$row.addClass('selected');
 								}
-							})
-							;
+							});
 
-							$dropdownList.append($row);
+				$dropdownList.append($row);
 			}
 
-
-			$searchInput.click(function()
+			$searchInput.after($dropdownList)
+			.click(function()
 			{
 				search( $searchInput.val(), 1);
 			})
@@ -210,7 +194,7 @@
 				var $row = $dropdownList.find('.selected').first();
 
 				if($row.length)
-					$searchInput.select($row);
+					$dropdownList.select($row);
 
 				$dropdownList.hide();
 			}
@@ -245,7 +229,6 @@
 					$dropdownList.scrollTop( $dropdownList.get(0).scrollHeight ).children().last().addClass('selected');
 				}
 			}
-
 
 			function pressDownArrow()
 			{
@@ -285,13 +268,9 @@
 				}
 			}
 
-
-
-
-
-			var locks = [];
 			function inputDelay(callback)
 			{
+				var locks = [];
 				locks.push(1);
 				setTimeout(function()
 				{
@@ -302,7 +281,6 @@
 					}
 				}, options['timeout']);
 			}
-
 
 			function search(value, forceShow)
 			{
@@ -340,7 +318,6 @@
 					filtering(value, variants);
 				}
 			}
-
 
 			function filtering(searchValue, variants)
 			{
