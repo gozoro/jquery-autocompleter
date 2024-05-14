@@ -14,7 +14,6 @@
 		return;
 	}
 
-
 	$.fn.autocompleter = function(variants, options)
 	{
 		options = $.extend({
@@ -25,10 +24,10 @@
 			hiddenDefaultValue: '',
 			value:   null,
 			row:     function(item, index){return item;},
-			matchValue:  function(item, index){return item;},
+			template:  function(item, index){return item;},
 
-			filter: function(item, index, searchValue, matchValue){
-				return matchValue.match( RegExp('^'+searchValue.replace(/[.*+\-?^${}()|[\]\\]/g, '\\$&'), 'i') );
+			filter: function(item, index, searchValue, template){
+				return template.match( RegExp('^'+searchValue.replace(/[.*+\-?^${}()|[\]\\]/g, '\\$&'), 'i') );
 			}
 
         }, options);
@@ -107,20 +106,20 @@
 				if(useHiddenInput)
 					$hiddenInput.val( $row.data('value') );
 
-				var matchValue = $row.data('match-value');
-				$searchInput.val( matchValue );
-				oldValue = matchValue;
+				var template = $row.data('template');
+				$searchInput.val( template );
+				oldValue = template;
 
 				return this;
 			}
 
 			$dropdownList.addItem = function(item, itemIndex)
 			{
-				var matchValue = options['matchValue'](item, itemIndex);
-				var value = useHiddenInput ? options['value'](item, itemIndex) : matchValue;
+				var template = options['template'](item, itemIndex);
+				var value = useHiddenInput ? options['value'](item, itemIndex) : template;
 
 				var $row = $('<div class="autocompleter-item">')
-							.attr('data-match-value', matchValue)
+							.attr('data-template', template)
 							.attr('data-value', value)
 							.html( options['row'](item, itemIndex) )
 							.mousedown(function(event)
@@ -180,7 +179,6 @@
 					case 27: pressEsc(event); return;
 				}
 			});
-
 
 			function pressEsc(event)
 			{
@@ -325,13 +323,13 @@
 				for(var itemIndex in variants)
 				{
 					var item = variants[itemIndex];
-					var matchValue = options['matchValue'](item, itemIndex);
+					var template = options['template'](item, itemIndex);
 
-					if( options['filter'](item, itemIndex, searchValue, matchValue) && (options['maxResults'] <= 0 || i < options['maxResults']) )
+					if( options['filter'](item, itemIndex, searchValue, template) && (options['maxResults'] <= 0 || i < options['maxResults']) )
 					{
-						var value = useHiddenInput ? options['value'](item, itemIndex) : matchValue;
+						var value = useHiddenInput ? options['value'](item, itemIndex) : template;
 
-						if(matchValue === searchValue)
+						if(template === searchValue)
 							$hiddenInput.val(value);
 
 						$dropdownList.addItem(item, itemIndex);
