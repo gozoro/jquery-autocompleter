@@ -16,91 +16,217 @@ A jQuery plugin autocomplete
 **Using an variant array**
 
 ```html
-	<input id="autocompleter" name="city" type="text" class="form-control"  value=""/>
-	<script>
-		$(document).ready(function()
-		{
-			var variants = ["Moscow", "Pekin", "London", "Paris", "Tokyo"];
 
-			$("#autocompleter").autocompleter(variants, [] );
-		});
-	</script>';
+
+
+<input id="autocompleter" name="country" type="text" class="form-control"  value="" autocomplete="off" />
+<script>
+	$(document).ready(function()
+	{
+		var variants = [
+			"Afghanistan",
+			"Albania",
+			"Algeria",
+			"Andorra",
+			"Angola",
+			"Antigua and Barbuda",
+			"Argentina",
+			"Armenia",
+			"Australia",
+			"Austria",
+			"Azerbaijan"
+		];
+
+		$("#autocompleter").autocompleter(variants);
+	});
+</script>';
 ```
 
+
+| ![Example](https://raw.githubusercontent.com/gozoro/jquery-autocompleter/main/images/autocompleter.gif) |
+|-|
 
 **Using AJAX**
 
 ```html
-	<input id="autocompleter" name="city" type="text" class="form-control"  value=""/>
-	<script>
-		$(document).ready(function()
-		{
-			var variants = "variants.php"; // script must be returns JSON with an variant array
+<input id="autocompleter" name="city" type="text" class="form-control"  value=""/>
+<script>
+	$(document).ready(function()
+	{
+		var variants = "variants.php"; // script must be returns JSON with an variant array
 
-			$("#autocompleter").autocompleter(variants, [] );
-		});
-	</script>';
+		$("#autocompleter").autocompleter(variants);
+	});
+</script>';
 ```
 
 ## Options
 
-- **maxResults:**
-Maximum number of suggestions (0 - no limits). Default value is 0.
+#### maxResults
+Maximum number of suggestions (0 - no limits). 
 
-- **maxResults:**
-Maximum number of suggestions (0 - no limits). Default value is 0.
+Default: 0.
 
-- **minChars:**
-Minimum number of characters for the suggestions. Default value is 1.
+#### minChars
+Minimum number of characters for the suggestions. 
 
-- **timeout:**
-Keyboard input timeout. Default value is 500 ms.
+Default: 1.
 
-- **matchRegexp:**
-Function must be returns a regexp-object used for filtering.
-Default value:
+#### timeout
+Keyboard input timeout.
+
+Default: 500 ms.
+
+
+#### ajaxData
+The function must return ajax-request data. Here you can get additional parameters for the ajax-request.
+
+Default:
 ```javascript
-	function(value, escape)
-	{
-		return RegExp(escape(value), 'i'); // escape - string escape function
-	}
+function(value)
+{
+	return {value:value};
+}
 ```
 
-- **matchValue:**
-Function must be returns a value used for filtering.
-Default value:
+- `value` - input search value
+
+#### template
+The function must return the item value used to compare with the input value when filtering.
+The result of the function determines the match of the input string.
+
+Default:
 ```javascript
-	function(item, index)
-	{
-		return item;
-	}
+function(item, index)
+{
+	return item;
+}
+```
+- `item` - item value of variant list.
+- `index` - item key of variant list.
+
+
+#### value
+The function must return value for the request (when item is selected).
+This option enables the use of hidden input.
+You can use this option when you want to use an identifier instead of a text string from input.
+
+Default: returned value of function from `template` option.
+
+Example:
+```javascript
+function(item, index)
+{
+	return index;
+}
 ```
 
-- **itemDisplay:**
-Function must be returns a value used for display a suggestions.
-Default value:
+- `item` - item value of variant list.
+- `index` - item key of variant list.
+
+#### hiddenDefaultValue
+Default value for the hidden input. 
+
+Default: "".
+
+
+
+#### row
+The function must return a value used for display a suggestions.
+You can change the format of the output suggestion string.
+
+Default:
 ```javascript
-	function(item, index)
-	{
-		return item;
-	}
+function(item, index)
+{
+	return item;
+}
 ```
 
-- **itemValue:**
-You can set a function returns a value for the request. Default value is "matchValue".
+- `item` - item value of variant list.
+- `index` - item key of variant list.
 
-- **emptyValue:**
-Empty value when itemValue is used.
-
-- **ajaxData:**
-Function must be returns default ajax-request data.
-Default value:
+Example:
 ```javascript
-	function(value)
-	{
-		return {value:value};
-	}
+function(item, index)
+{
+	return '<span style="red">' + item + '</span>';
+}
 ```
 
-- **hiddenValue:**
-Default value for the hidden input. Default value is "".
+
+#### filter
+Function must return a boolean value. 
+When a variant must be included in the list of suggestions this function must return `true` instead of `false`.
+
+Default:
+```javascript
+function(item, index, searchValue, template)
+{
+	return template.match( RegExp('^'+searchValue.replace(/[.*+\-?^${}()|[\]\\]/g, '\\$&'), 'i') );
+}
+```
+
+- `item` - item value of variant list.
+- `index` - item key of variant list.
+- `searchValue` - current value of input.
+- `template` - value of option `template`.
+
+
+## Events
+
+#### autocompleter.select
+
+The event is triggered when an item from the list of variants is selected.
+
+
+#### autocompleter.unselect
+
+The event is triggered when an item from the list of variants is unselected.
+
+Example:
+
+```html
+<style>
+
+.form-control.success{
+	border-color: #3c763d;
+	background-color: #dff0d8;
+}
+</style>
+
+
+<input id="autocompleter" name="country" type="text" class="form-control"  value="" autocomplete="off" />
+<script>
+$(document).ready(function()
+{
+	var variants = [
+		"Afghanistan",
+		"Albania",
+		"Algeria",
+		"Andorra",
+		"Angola",
+		"Antigua and Barbuda",
+		"Argentina",
+		"Armenia",
+		"Australia",
+		"Austria",
+		"Azerbaijan"
+	];
+
+	$("#autocompleter").autocompleter(variants)
+	.on('autocompleter.select', function(event, data)
+	{
+		$(this).addClass('success');
+		console.log('selected:', data.value, data.template);
+
+	})
+	.on('autocompleter.unselect', function(event){
+		$(this).removeClass('success');
+	});
+});
+</script>';
+```
+
+| ![Example](https://raw.githubusercontent.com/gozoro/jquery-autocompleter/main/images/autocompleter.events.gif) |
+|-|
