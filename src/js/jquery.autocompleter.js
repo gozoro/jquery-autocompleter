@@ -33,8 +33,6 @@
 
         }, options);
 
-		var _this = this;
-
 
 		return this.each(function()
 		{
@@ -108,8 +106,6 @@
 
 				if(useHiddenInput)
 					$searchInput.selected($row.data('value'), template);
-
-				$searchInput.trigger('select', {template:template, value:$row.data('value')});
 
 				return this;
 			}
