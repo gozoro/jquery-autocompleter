@@ -99,14 +99,9 @@
 			$dropdownList.select = function($row)
 			{
 				$dropdownList.unselect().empty();
-
 				var template = $row.data('template');
-				$searchInput.val( template );
 				oldValue = template;
-
-				if(useHiddenInput)
-					$searchInput.selected($row.data('value'), template);
-
+				$searchInput.selected($row.data('value'), template).val( template );
 				return this;
 			}
 
@@ -148,8 +143,11 @@
 
 			$searchInput.selected = function(value, template)
 			{
-				$hiddenInput.val(value);
+				if(useHiddenInput)
+					$hiddenInput.val(value);
+
 				$searchInput.addClass('selected').trigger('autocompleter.select', {value:value, template:template});
+				return this;
 			}
 
 			$searchInput.after($dropdownList)
