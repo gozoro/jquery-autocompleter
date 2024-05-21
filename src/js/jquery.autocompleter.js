@@ -14,6 +14,7 @@
 		return;
 	}
 
+
 	$.fn.autocompleter = function(variants, options)
 	{
 		options = $.extend({
@@ -82,7 +83,6 @@
 
 				dropdownListVisible = true;
 				$dropdownList.unselect().scrollTop(0).children().first().addClass('selected');
-				_this.trigger('resultShow', {});
 			}
 
 			$dropdownList.hide = function()
@@ -90,7 +90,6 @@
 				$.fn.hide.apply(this, arguments);
 
 				dropdownListVisible = false;
-				_this.trigger('resultHide', {});
 			}
 
 			$dropdownList.mouseout(function()
@@ -103,12 +102,14 @@
 			{
 				$dropdownList.unselect().empty();
 
-				if(useHiddenInput)
-					$hiddenInput.val( $row.data('value') );
-
 				var template = $row.data('template');
 				$searchInput.val( template );
 				oldValue = template;
+
+				if(useHiddenInput)
+					$searchInput.selected($row.data('value'), template);
+
+				$searchInput.trigger('select', {template:template, value:$row.data('value')});
 
 				return this;
 			}
@@ -149,6 +150,12 @@
 				$dropdownList.append($row);
 			}
 
+			$searchInput.selected = function(value, template)
+			{
+				$hiddenInput.val(value);
+				$searchInput.addClass('selected').trigger('select', {value:value, template:template});
+			}
+
 			$searchInput.after($dropdownList)
 			.click(function()
 			{
@@ -179,6 +186,7 @@
 					case 27: pressEsc(event); return;
 				}
 			});
+
 
 			function pressEsc(event)
 			{
@@ -295,6 +303,12 @@
 				}
 
 				$hiddenInput.val(options['hiddenDefaultValue']);
+
+				if($searchInput.hasClass('selected'))
+				{
+					$searchInput.removeClass('selected').trigger('unselect');
+				}
+
 				oldValue = value;
 				$dropdownList.empty();
 
@@ -303,8 +317,6 @@
 					$dropdownList.hide();
 					return;
 				}
-
-				_this.trigger('beforeSearch', {val:value});
 
 				if(variants.constructor.name == 'String')
 				{
@@ -330,7 +342,7 @@
 						var value = useHiddenInput ? options['value'](item, itemIndex) : template;
 
 						if(template === searchValue)
-							$hiddenInput.val(value);
+							$searchInput.selected(value, template);
 
 						$dropdownList.addItem(item, itemIndex);
 						i++;
