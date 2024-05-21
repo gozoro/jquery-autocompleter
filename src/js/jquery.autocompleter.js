@@ -149,7 +149,7 @@
 			$searchInput.selected = function(value, template)
 			{
 				$hiddenInput.val(value);
-				$searchInput.addClass('selected').trigger('select', {value:value, template:template});
+				$searchInput.addClass('selected').trigger('autocompleter.select', {value:value, template:template});
 			}
 
 			$searchInput.after($dropdownList)
@@ -302,7 +302,7 @@
 
 				if($searchInput.hasClass('selected'))
 				{
-					$searchInput.removeClass('selected').trigger('unselect');
+					$searchInput.removeClass('selected').trigger('autocompleter.unselect');
 				}
 
 				oldValue = value;
