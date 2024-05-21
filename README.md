@@ -11,7 +11,7 @@ A jQuery plugin autocomplete
 ```
 
 ## Usage
------
+
 
 **Using an variant array**
 
