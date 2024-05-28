@@ -72,8 +72,8 @@ Minimum number of characters for the suggestions.
 
 Default: 1.
 
-#### timeout
-Keyboard input timeout.
+#### delay
+Keyboard input delay.
 
 Default: 500 ms.
 

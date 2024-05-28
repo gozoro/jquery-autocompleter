@@ -20,7 +20,7 @@
 		options = $.extend({
             maxResults: 0,
 			minChars: 1,
-			timeout: 500,
+			delay: 500,
 			ajaxData: function(value){return {value:value};},
 			hiddenDefaultValue: '',
 			value:   null,
@@ -279,7 +279,7 @@
 					{
 						callback();
 					}
-				}, options['timeout']);
+				}, options['delay']);
 			}
 
 			function search(value, forceShow)
