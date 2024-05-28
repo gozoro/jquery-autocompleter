@@ -29,8 +29,8 @@
 			template: function(item, index){return item;},
 			row: options['template'] || defaultRow,
 
-			filter: function(item, index, searchValue, template){
-				return template.match( RegExp('^'+searchValue.replace(/[.*+\-?^${}()|[\]\\]/g, '\\$&'), 'i') );
+			filter: function(item, index, inputValue, template){
+				return template.match( RegExp('^'+inputValue.replace(/[.*+\-?^${}()|[\]\\]/g, '\\$&'), 'i') );
 			}
 
         }, options);
@@ -41,20 +41,20 @@
 			var mouseLock           = false;
 			var dropdownListVisible = false;
 			var useHiddenInput      = (typeof options['value'] == 'function');
-			var $searchInput        = $(this);
-			var oldValue            = $searchInput.val().trim();
+			var $input              = $(this);
+			var oldValue            = $input.val().trim();
 			var hiddenValue         = options['hiddenDefaultValue'];
 			var $hiddenInput        = $('<input type="hidden" value="'+hiddenValue+'">');
 			var $dropdownList       = $('<div class="multiselect-dropdownlist">');
 
 			function reposition()
 			{
-				var pos = $searchInput.position();
+				var pos = $input.position();
 
 				$dropdownList.css({
 					left: pos.left,
-					top: pos.top + $searchInput.outerHeight(),
-					width: $searchInput.outerWidth()
+					top: pos.top + $input.outerHeight(),
+					width: $input.outerWidth()
 				});
 			}
 
@@ -67,8 +67,8 @@
 
 			if(useHiddenInput)
 			{
-				$hiddenInput.attr('name', $searchInput.attr('name') );
-				$searchInput.removeAttr('name').after($hiddenInput);
+				$hiddenInput.attr('name', $input.attr('name') );
+				$input.removeAttr('name').after($hiddenInput);
 			}
 
 			$dropdownList.unselect = function()
@@ -103,7 +103,7 @@
 				$dropdownList.unselect().empty();
 				var template = $row.data('template');
 				oldValue = template;
-				$searchInput.selected($row.data('value'), template).val( template );
+				$input.selected($row.data('value'), template).val( template );
 				return this;
 			}
 
@@ -143,19 +143,19 @@
 				$dropdownList.append($row);
 			}
 
-			$searchInput.selected = function(value, template)
+			$input.selected = function(value, template)
 			{
 				if(useHiddenInput)
 					$hiddenInput.val(value);
 
-				$searchInput.addClass('selected').trigger('autocompleter.select', {value:value, template:template});
+				$input.addClass('selected').trigger('autocompleter.select', {value:value, template:template});
 				return this;
 			}
 
-			$searchInput.after($dropdownList)
+			$input.after($dropdownList)
 			.click(function()
 			{
-				search( $searchInput.val(), 1);
+				search( $input.val(), 1);
 			})
 			.blur(function()
 			{
@@ -169,7 +169,7 @@
 			{
 				inputDelay(function()
 				{
-					search( $searchInput.val() );
+					search( $input.val() );
 				});
 			})
 			.keydown(function(event)
@@ -300,9 +300,9 @@
 
 				$hiddenInput.val(options['hiddenDefaultValue']);
 
-				if($searchInput.hasClass('selected'))
+				if($input.hasClass('selected'))
 				{
-					$searchInput.removeClass('selected').trigger('autocompleter.unselect');
+					$input.removeClass('selected').trigger('autocompleter.unselect');
 				}
 
 				oldValue = value;
@@ -338,7 +338,7 @@
 						var value = useHiddenInput ? options['value'](item, itemIndex) : template;
 
 						if(template === searchValue)
-							$searchInput.selected(value, template);
+							$input.selected(value, template);
 
 						$dropdownList.addItem(item, itemIndex);
 						i++;
