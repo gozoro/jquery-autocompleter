@@ -17,15 +17,17 @@
 
 	$.fn.autocompleter = function(variants, options)
 	{
+		var defaultRow = function(item, index){return item;}
+
 		options = $.extend({
             maxResults: 0,
 			minChars: 1,
 			delay: 500,
 			ajaxData: function(value){return {value:value};},
 			hiddenDefaultValue: '',
-			value:   null,
-			row:     function(item, index){return item;},
-			template:  function(item, index){return item;},
+			value: null,
+			template: function(item, index){return item;},
+			row: options['template'] || defaultRow,
 
 			filter: function(item, index, searchValue, template){
 				return template.match( RegExp('^'+searchValue.replace(/[.*+\-?^${}()|[\]\\]/g, '\\$&'), 'i') );
