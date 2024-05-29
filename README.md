@@ -163,7 +163,7 @@ Default:
 ```javascript
 function(item, index, inputValue, template)
 {
-	template.includes(inputValue);
+	return ~template.toLowerCase().indexOf(inputValue.toLowerCase());
 }
 ```
 

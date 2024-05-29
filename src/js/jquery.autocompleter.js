@@ -30,7 +30,7 @@
 			row: options['template'] || defaultRow,
 
 			filter: function(item, index, inputValue, template){
-				return template.includes(inputValue);
+				return ~template.toLowerCase().indexOf(inputValue.toLowerCase());
 			}
 
         }, options);
