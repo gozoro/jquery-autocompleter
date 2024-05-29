@@ -161,15 +161,15 @@ When a variant must be included in the list of suggestions this function must re
 
 Default:
 ```javascript
-function(item, index, searchValue, template)
+function(item, index, inputValue, template)
 {
-	return template.match( RegExp('^'+searchValue.replace(/[.*+\-?^${}()|[\]\\]/g, '\\$&'), 'i') );
+	template.includes(inputValue);
 }
 ```
 
 - `item` - item value of variant list.
 - `index` - item key of variant list.
-- `searchValue` - current value of input.
+- `inputValue` - current input value.
 - `template` - value of option `template`.
 
 

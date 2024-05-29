@@ -30,7 +30,7 @@
 			row: options['template'] || defaultRow,
 
 			filter: function(item, index, inputValue, template){
-				return template.match( RegExp('^'+inputValue.replace(/[.*+\-?^${}()|[\]\\]/g, '\\$&'), 'i') );
+				return template.includes(inputValue);
 			}
 
         }, options);
