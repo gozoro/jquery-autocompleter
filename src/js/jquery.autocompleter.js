@@ -19,6 +19,8 @@
 	{
 		var defaultRow = function(item, index){return item;}
 
+		options = options || {};
+
 		options = $.extend({
             maxResults: 0,
 			minChars: 1,
