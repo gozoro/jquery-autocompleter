@@ -175,12 +175,12 @@ function(item, index, inputValue, template)
 
 ## Events
 
-#### autocompleter.select
+#### autocompleter:select
 
 The event is triggered when an item from the list of variants is selected.
 
 
-#### autocompleter.unselect
+#### autocompleter:unselect
 
 The event is triggered when an item from the list of variants is unselected.
 
@@ -215,13 +215,13 @@ $(document).ready(function()
 	];
 
 	$("#autocompleter").autocompleter(variants)
-	.on('autocompleter.select', function(event, data)
+	.on('autocompleter:select', function(event, data)
 	{
 		$(this).addClass('success');
 		console.log('selected:', data.value, data.template);
 
 	})
-	.on('autocompleter.unselect', function(event){
+	.on('autocompleter:unselect', function(event){
 		$(this).removeClass('success');
 	});
 });
