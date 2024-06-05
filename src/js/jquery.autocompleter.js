@@ -15,7 +15,7 @@
 	}
 
 
-	$.fn.autocompleter = function(variants, options)
+	$.fn.autocompleter = function(items, options)
 	{
 		var defaultRow = function(item, index){return item;}
 
@@ -319,23 +319,23 @@
 					return;
 				}
 
-				if(variants.constructor.name == 'String')
+				if(items.constructor.name == 'String')
 				{
-					$.get(variants, options['ajaxData'](value), function(response){ filtering(value, response); });
+					$.get(items, options['ajaxData'](value), function(response){ filtering(value, response); });
 				}
 				else
 				{
 
-					filtering(value, variants);
+					filtering(value, items);
 				}
 			}
 
-			function filtering(searchValue, variants)
+			function filtering(searchValue, items)
 			{
 				var i = 0;
-				for(var itemIndex in variants)
+				for(var itemIndex in items)
 				{
-					var item = variants[itemIndex];
+					var item = items[itemIndex];
 					var template = options['template'](item, itemIndex);
 
 					if( options['filter'](item, itemIndex, searchValue, template) && (options['maxResults'] <= 0 || i < options['maxResults']) )

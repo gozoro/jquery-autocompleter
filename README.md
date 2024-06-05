@@ -23,7 +23,7 @@ A jQuery plugin autocomplete
 <script>
 	$(document).ready(function()
 	{
-		var variants = [
+		var items = [
 			"Afghanistan",
 			"Albania",
 			"Algeria",
@@ -37,7 +37,7 @@ A jQuery plugin autocomplete
 			"Azerbaijan"
 		];
 
-		$("#autocompleter").autocompleter(variants);
+		$("#autocompleter").autocompleter(items);
 	});
 </script>';
 ```
@@ -53,9 +53,9 @@ A jQuery plugin autocomplete
 <script>
 	$(document).ready(function()
 	{
-		var variants = "variants.php"; // script must be returns JSON with an variant array
+		var items = "script_get_items.php"; // script must be returns JSON with an variant array
 
-		$("#autocompleter").autocompleter(variants);
+		$("#autocompleter").autocompleter(items);
 	});
 </script>';
 ```
@@ -177,12 +177,12 @@ function(item, index, inputValue, template)
 
 #### autocompleter:select
 
-The event is triggered when an item from the list of variants is selected.
+The event is triggered when an item from the list of items is selected.
 
 
 #### autocompleter:unselect
 
-The event is triggered when an item from the list of variants is unselected.
+The event is triggered when an item from the list of items is unselected.
 
 Example:
 
@@ -200,7 +200,7 @@ Example:
 <script>
 $(document).ready(function()
 {
-	var variants = [
+	var items = [
 		"Afghanistan",
 		"Albania",
 		"Algeria",
@@ -214,7 +214,7 @@ $(document).ready(function()
 		"Azerbaijan"
 	];
 
-	$("#autocompleter").autocompleter(variants)
+	$("#autocompleter").autocompleter(items)
 	.on('autocompleter:select', function(event, data)
 	{
 		$(this).addClass('success');
