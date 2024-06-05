@@ -155,27 +155,29 @@
 				return this;
 			}
 
+			var namespace = '.autocompleter';
+
 			$input.after($dropdownList)
-			.click(function()
+			.on('click'+namespace, function()
 			{
 				search( $input.val(), 1);
 			})
-			.blur(function()
+			.on('blur'+namespace, function()
 			{
 				$dropdownList.hide();
 			})
-			.on('paste', function(event)
+			.on('paste'+namespace, function(event)
 			{
 				search( event.originalEvent.clipboardData.getData('text'), 1);
 			})
-			.keyup(function()
+			.on('keyup'+namespace, function()
 			{
 				inputDelay(function()
 				{
 					search( $input.val() );
 				});
 			})
-			.keydown(function(event)
+			.on('keydown'+namespace, function(event)
 			{
 				switch(event.which)
 				{
