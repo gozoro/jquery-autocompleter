@@ -150,7 +150,8 @@
 				if(useHiddenInput)
 					$hiddenInput.val(value);
 
-				$input.addClass('selected').trigger('autocompleter:select', {value:value, template:template});
+				if(!$input.hasClass('selected'))
+					$input.addClass('selected').trigger('autocompleter:select', {value:value, template:template});
 				return this;
 			}
 
